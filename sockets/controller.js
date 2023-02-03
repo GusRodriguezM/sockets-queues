@@ -13,6 +13,9 @@ export const socketController = ( socket ) => {
     //Sending the last ticket to the client
     socket.emit( 'last-ticket', ticketControl.lastTicket );
 
+    //Sending the last four tickets to the client
+    socket.emit( 'current-status', ticketControl.lastFourTickets );
+
     //Getting the next ticket and sending through the callback to the client
     socket.on( 'next-ticket', ( payload, callback ) => {
         
@@ -39,6 +42,9 @@ export const socketController = ( socket ) => {
         
         //Calling the method to serve the next ticket
         const ticket = ticketControl.serveTicket( currentWindow );
+
+        //Sending the last four tickets to the client (in all the public screens)
+        socket.broadcast.emit( 'current-status', ticketControl.lastFourTickets );
 
         //If there is no more tickets to serve then we return an error
         if( !ticket ){
