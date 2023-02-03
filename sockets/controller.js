@@ -10,11 +10,15 @@ export const socketController = ( socket ) => {
         console.log('Client disconnected...', socket.id);
     });
 
+    //The events below are fired when a client is connected
     //Sending the last ticket to the client
     socket.emit( 'last-ticket', ticketControl.lastTicket );
 
     //Sending the last four tickets to the client
     socket.emit( 'current-status', ticketControl.lastFourTickets );
+
+    //Sending the number of tickets left
+    socket.emit( 'pending-tickets', ticketControl.tickets.length );
 
     //Getting the next ticket and sending through the callback to the client
     socket.on( 'next-ticket', ( payload, callback ) => {
@@ -22,7 +26,8 @@ export const socketController = ( socket ) => {
         const nextTicket = ticketControl.nextTicket();
         callback( nextTicket );
 
-        //TODO: Notify there is a pending ticket to assign
+        //Sending the number of tickets everytime a new ticket is assigned
+        socket.broadcast.emit( 'pending-tickets', ticketControl.tickets.length );
 
     });
 
@@ -45,6 +50,10 @@ export const socketController = ( socket ) => {
 
         //Sending the last four tickets to the client (in all the public screens)
         socket.broadcast.emit( 'current-status', ticketControl.lastFourTickets );
+
+        //Sending the number of pending tickets to the clients
+        socket.emit( 'pending-tickets', ticketControl.tickets.length );
+        socket.broadcast.emit( 'pending-tickets', ticketControl.tickets.length );
 
         //If there is no more tickets to serve then we return an error
         if( !ticket ){

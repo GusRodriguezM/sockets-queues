@@ -3,6 +3,7 @@ const lblWindow = document.querySelector('h1');
 const btnServeTicket = document.querySelector('button');
 const lblTicket = document.querySelector('small');
 const divAlert = document.querySelector('.alert');
+const lblPending = document.querySelector('#lblPending');
 
 //Getting the params from the url
 const searchParams = new URLSearchParams( window.location.search );
@@ -37,6 +38,16 @@ socket.on( 'disconnect', () => {
 //Getting the last ticket sent by the server
 socket.on( 'last-ticket', ( lastTicket ) => {
     // lblNewTicket.innerText = `Ticket ${lastTicket}`;
+});
+
+//Getting the number of pendin tickes to show in the screen to assign tickets
+socket.on( 'pending-tickets', ( pendingTickets ) => {
+    if( pendingTickets === 0 ){
+        lblPending.style.display = 'none';    
+    }else{
+        lblPending.style.display = '';    
+        lblPending.innerText = pendingTickets;
+    }
 });
 
 //Adding an event listener to the button
